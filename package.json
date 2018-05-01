@@ -1,0 +1,19 @@
+{
+  "name": "elect-field",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhshize/elect-filed.git"
+  },
+  "author": "zhshize",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhshize/elect-filed/issues"
+  },
+  "homepage": "https://github.com/zhshize/elect-filed#readme"
+}
