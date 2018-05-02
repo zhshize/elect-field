@@ -131,6 +131,18 @@ var vzero = {
 
 };
 
+function getField(t) {
+    return 10;
+}
+
+function getCharge(t) {
+    return charge;
+}
+
+function getElectricForce(t) {
+    return getField(t) * getCharge(t);
+}
+
 var field = 30;
 var charge = 5;
 
