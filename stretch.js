@@ -51,6 +51,7 @@ var pc = {
         // If so, keep track of relative location of click to corner of rectangle
         this.offsetX = this.x - mouseX;
         this.offsetY = this.y - mouseY;
+        run(0,30);
     },
 
     registerMouseReleased: function () {
@@ -127,12 +128,28 @@ var vzero = {
 
     mouseReleased: function () {
         this.dragging = false;
+        run(0,30);
     },
 
 };
 
+// Result
+var result = [];
+var isRan = false;
+
+function getInitialVelocity() {
+    var r = {
+        x: vzero.x - pc.x,
+        y: vzero.y - pc.y
+    };
+    return r;
+}
+
 function getField(t) {
-    return 10;
+    return {
+        x: 0, 
+        y: 3
+    };
 }
 
 function getCharge(t) {
@@ -140,8 +157,81 @@ function getCharge(t) {
 }
 
 function getElectricForce(t) {
-    return getField(t) * getCharge(t);
+    var field = getField(t);
+    var charge = getCharge(t);
+    return {
+        x: charge * field.x,
+        y: charge * field.y
+    };
 }
+
+function getInterval(t) {
+    return 0.01;
+}
+
+function isInField(x, y) {
+
+}
+
+function getChargeMass(t) {
+    return 0.1;
+}
+
+function run(timeFrom, timeTo) {
+    isRan = true;
+
+    result = [];
+
+    var interval = getInterval(-1);
+
+    result.push({
+        position: {
+            x: pc.x,
+            y: pc.y
+        },
+        displacement: {
+            x: 0,
+            y: 0
+        },
+        velocity: {
+            x: getInitialVelocity().x,
+            y: getInitialVelocity().y
+        }
+    });
+
+    for (var i = timeFrom; i <= timeTo; i += interval) {
+
+        var prev = result[result.length - 1];
+
+        var acceleration = {
+            x: getElectricForce(i).x/getChargeMass(i),
+            y: getElectricForce(i).y/getChargeMass(i)
+        };
+
+        var displacement = {
+            x: prev.velocity.x * interval + 0.5 * acceleration.x * interval*interval,
+            y: prev.velocity.y * interval + 0.5 * acceleration.y * interval*interval
+        };
+
+        var velocity = {
+            x: prev.velocity.x + acceleration.x * interval,
+            y: prev.velocity.y + acceleration.y * interval
+        };
+
+        var position = {
+            x: prev.position.x + displacement.x,
+            y: prev.position.y + displacement.y
+        };
+
+        result.push({
+            position: position,
+            displacement: displacement,
+            velocity: velocity
+        });
+    }
+    console.log(result);
+}
+
 
 var field = 30;
 var charge = 5;
@@ -175,6 +265,13 @@ function draw() {
     vzero.draw();
     pc.draw();
 
+    if (isRan)
+        for (var i = 0; i < 300; i++) {
+            if ( !(result[i].position.x < document.body.clientWidth && result[i].position.y < document.body.clientHeight)) return;
+            fill(color(0, 0, 0));
+            strokeWeight(0);
+            ellipse(result[i].position.x, result[i].position.y, 3, 3);
+        }
 }
 
 // dynamically adjust the canvas to the window
@@ -187,7 +284,15 @@ function mousePressed() {
     vzero.registerMousePressed();
 }
 
+function touchStarted() {
+    mousePressed();
+}
+
 function mouseReleased() {
     pc.registerMouseReleased();
     vzero.registerMouseReleased();
+}
+
+function touchEnded() {
+    mouseReleased();
 }
