@@ -1,12 +1,14 @@
 var canvas;
-var gui;
+
+
 
 // Point Charge
 var pc = {
     dragging: false, // Is the object being dragged?
     rollover: false, // Is the mouse over the ellipse?
-    x: 350,
-    y: 360,
+    x: 250,
+    y: 260,
+    z: 0,
     r: 5,
     offsetX: 0,   // MouseClick offset x
     offsetY: 0,    // MouseClick offset y
@@ -68,8 +70,8 @@ var pc = {
 var vzero = {
     dragging: false, // Is the object being dragged?
     rollover: false, // Is the mouse over the ellipse?
-    x: 380,
-    y: 360,
+    x: 700,
+    y: 260,
     r: 10,
     offsetX: 0,   // MouseClick offset x
     offsetY: 0,    // MouseClick offset y
@@ -133,35 +135,57 @@ var vzero = {
 
 };
 
+// Field
+var fb = {
+    x: 300,
+    y: 200,
+
+    // width at y-axis --
+    d: 150,
+
+    // width at x-axis |
+    l: 300
+};
+
 // Result
 var result = [];
 var isRan = false;
 
+var fieldy = 30;
+var fieldz = 0;
+var charge = 5;
+
 function getInitialVelocity() {
     var r = {
         x: vzero.x - pc.x,
-        y: vzero.y - pc.y
+        y: vzero.y - pc.y,
+        z: vzero.y - pc.y
     };
     return r;
 }
 
-function getField(t) {
-    return {
-        x: 0, 
-        y: 3
-    };
+function getField(x, y, z, t) {
+    if (x >= fb.x && x <= fb.x + fb.l && y >= fb.y && y <= fb.y + fb.d)
+        return {
+            x: 0,
+            y: fieldy,
+            z: fieldz
+        };
+    else
+        return {x: 0, y: 0, z: 0};
 }
 
-function getCharge(t) {
+function getCharge(x, y, z, t) {
     return charge;
 }
 
-function getElectricForce(t) {
-    var field = getField(t);
-    var charge = getCharge(t);
+function getElectricForce(x, y, z, t) {
+    var field = getField(x, y, z, t);
+    var charge = getCharge(x, y, z, t);
     return {
         x: charge * field.x,
-        y: charge * field.y
+        y: charge * field.y,
+        z: charge * field.z
     };
 }
 
@@ -187,40 +211,50 @@ function run(timeFrom, timeTo) {
     result.push({
         position: {
             x: pc.x,
-            y: pc.y
+            y: pc.y,
+            z: pc.z
         },
         displacement: {
             x: 0,
-            y: 0
+            y: 0,
+            z: 0
         },
         velocity: {
             x: getInitialVelocity().x,
-            y: getInitialVelocity().y
+            y: getInitialVelocity().y,
+            z: getInitialVelocity().z
         }
     });
 
     for (var i = timeFrom; i <= timeTo; i += interval) {
 
         var prev = result[result.length - 1];
+        var pos = prev.position;
+        var vel = prev.velocity;
 
+        var electricForce = getElectricForce(pos.x, pos.y, pos.z, i);
         var acceleration = {
-            x: getElectricForce(i).x/getChargeMass(i),
-            y: getElectricForce(i).y/getChargeMass(i)
+            x: electricForce.x/getChargeMass(i),
+            y: electricForce.y/getChargeMass(i),
+            z: electricForce.z/getChargeMass(i)
         };
 
         var displacement = {
-            x: prev.velocity.x * interval + 0.5 * acceleration.x * interval*interval,
-            y: prev.velocity.y * interval + 0.5 * acceleration.y * interval*interval
+            x: vel.x * interval + 0.5 * acceleration.x * interval*interval,
+            y: vel.y * interval + 0.5 * acceleration.y * interval*interval,
+            z: vel.z * interval + 0.5 * acceleration.z * interval*interval
         };
 
         var velocity = {
-            x: prev.velocity.x + acceleration.x * interval,
-            y: prev.velocity.y + acceleration.y * interval
+            x: vel.x + acceleration.x * interval,
+            y: vel.y + acceleration.y * interval,
+            z: vel.z + acceleration.z * interval
         };
 
         var position = {
-            x: prev.position.x + displacement.x,
-            y: prev.position.y + displacement.y
+            x: pos.x + displacement.x,
+            y: pos.y + displacement.y,
+            z: pos.z + displacement.z
         };
 
         result.push({
@@ -232,35 +266,17 @@ function run(timeFrom, timeTo) {
     console.log(result);
 }
 
-
-var field = 30;
-var charge = 5;
-
-function tx(x) {
-    return 200 + x;
-}
-
-function ty(y) {
-    return 200 + y;
-}
-
 function setup() {
     createCanvas(windowWidth, windowHeight);
-
-    gui = createGui('p5.gui');
-    gui.addGlobals('field');
-
-    sliderRange(-10, 10, 0.01);
-    gui.addGlobals('charge');
 }
 
 function draw() {
     background(220, 180, 200);
 
     fill(color(66, 134, 244));
-    rect(400, 300, 300, 20);
+    rect(fb.x, fb.y, fb.l, 20);
     fill(color(255, 89, 89));
-    rect(400, 450, 300, 20);
+    rect(fb.x, fb.y + fb.d, fb.l, 20);
 
     vzero.draw();
     pc.draw();
