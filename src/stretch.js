@@ -15,6 +15,14 @@ var fieldZMin = -10.0;
 var fieldZMax = 10.0;
 var fieldZStep = 0.1;
 
+var fieldBoardDistance = 150;
+var fieldBoardDistanceMin = 0;
+var fieldBoardDistanceMax = 1000;
+
+var fieldBoardLength = 300;
+var fieldBoardLengthMin = 0;
+var fieldBoardLengthMax = 1000;
+
 var xa = {
     // Point Charge
     pc: {
@@ -155,10 +163,25 @@ var xa = {
         y: 200,
 
         // width at y-axis --
-        d: 150,
+        d: fieldBoardDistance,
 
         // width at x-axis |
-        l: 300
+        l: fieldBoardLength,
+
+        getD: function() {
+            return fieldBoardDistance;
+        },
+
+        getL: function() {
+            return fieldBoardLength;
+        },
+
+        draw: function () {
+            fill(color(66, 134, 244));
+            rect(this.x, this.y, this.getL(), 20);
+            fill(color(255, 89, 89));
+            rect(this.x, this.y + this.getD(), this.getL(), 20);
+        }
     },
 
     /** @var Array */
@@ -179,7 +202,7 @@ var xa = {
         return r;
     },
     getField: function (x, y, z, t) {
-        if (x >= xa.fb.x && x <= xa.fb.x + xa.fb.l && y >= xa.fb.y && y <= xa.fb.y + xa.fb.d)
+        if (x >= xa.fb.x && x <= xa.fb.x + xa.fb.getL() && y >= xa.fb.y && y <= xa.fb.y + xa.fb.getD())
             return {
                 x: 0,
                 y: fieldY,
@@ -273,8 +296,10 @@ var xa = {
 
             this.result.push(now);
 
-            if (prev.position.x <= screen.d && now.position.x >= screen.d)
+            if (prev.position.x <= screen.d && now.position.x >= screen.d) {
                 screen.light(prev, now);
+            }
+
         }
         //console.log(this.result);
     },
@@ -376,18 +401,14 @@ function setup() {
     screen.init();
     createCanvas(windowWidth, windowHeight);
     var gui = createGui('Label');
-    gui.addGlobals('fieldY', 'fieldZ');
+    gui.addGlobals('fieldY', 'fieldZ', 'fieldBoardDistance', 'fieldBoardLength');
 }
 
 function draw() {
     background(220, 180, 200);
     strokeWeight(0);
 
-    fill(color(66, 134, 244));
-    rect(xa.fb.x, xa.fb.y, xa.fb.l, 20);
-    fill(color(255, 89, 89));
-    rect(xa.fb.x, xa.fb.y + xa.fb.d, xa.fb.l, 20);
-
+    xa.fb.draw();
     xa.vzero.draw();
     xa.pc.draw();
 
