@@ -312,16 +312,16 @@ var screen = {
     visible: true,
 
     init: function() {
-        for (var i = 0; i < 19; i++) {
+        for (var i = 0; i <= this.pixelNumY; i++) {
             this.pixel[i] = [];
-            for (var j = 0; j < 19; j++)
+            for (var j = 0; j <= this.pixelNumZ; j++)
                 this.pixel[i][j] = 0;
         }
     },
 
     clear: function() {
-        for (var i = 0; i < 19; i++)
-            for (var j = 0; j < 19; j++)
+        for (var i = 0; i <= this.pixelNumY; i++)
+            for (var j = 0; j <= this.pixelNumZ; j++)
                 this.pixel[i][j] = 0;
     },
 
@@ -334,10 +334,10 @@ var screen = {
     startY: 95,
     startZ: -190,
 
-    pixelNumZ: 18,
-    pixelNumY: 18,
+    pixelNumZ: 72,
+    pixelNumY: 72,
 
-    pixelWidth: 20,
+    pixelWidth: 5,
 
     draw: function () {
         if (this.visible === false) return;
@@ -446,4 +446,12 @@ function mouseReleased() {
 
 function touchEnded() {
     mouseReleased();
+}
+
+function sinGraph() {
+    var fieldPair = [];
+    for (var i = -1.2; i <= 1.2; i += 0.01) {
+        fieldPair.push([Math.sin(i*10) * 5, i * 5]);
+    }
+    screen.paintFromFieldPairs(fieldPair);
 }
