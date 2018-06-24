@@ -13,9 +13,9 @@
     <script src="util.js"></script>
     <script src="stretch.js"></script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../lib/bootstrap/css/bootstrap.min.css">
+    <script src="../lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../lib/jquery-3.3.1.min.js"></script>
     <style>
         .custom-control {
             position: absolute;
@@ -23,7 +23,7 @@
             bottom: 0;
             margin: 4px;
             padding: 4px;
-            width: 320px;
+            width: 480px;
             background-color: rgba(255,255,255,0.60);
         }
     </style>
@@ -156,12 +156,30 @@
         <button onclick="screen.clear()">Clear Screen</button>
         <button onclick="screen.toggle()">Toggle Screen</button>
         <button onclick="sinGraph()">Sin()</button>
+        <button onclick="customGraph()">Customized Graph</button>
         <button onclick="screen.paintFromFieldPairs(JSON.parse($('#fieldPairsText').val()))">Draw Screen by field pairs</button>
         <div class="input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text">Field pairs</span>
             </div>
-            <textarea id="fieldPairsText" class="form-control" aria-label="Field pairs"></textarea>
+            <textarea id="fieldPairsText" class="form-control" aria-label="Field pairs">
+[
+    [0, 0],
+    [6, 6]
+]
+            </textarea>
+        </div>
+        <div class="input-group">
+            <div class="input-group">
+                <span class="input-group-text">Customized Graph Function</span>
+            </div>
+            <textarea id="customGraphText" class="form-control" aria-label="Field pairs" style="font-family: monospace; height: 200px">
+var fieldPair = [];
+for (var i = -1.2; i <= 1.2; i += 0.005) {
+    fieldPair.push([Math.sin(i*10.0) * 5.0, Math.sin(i*10.0 + 12) * 5.0]);
+}
+screen.paintFromFieldPairs(fieldPair);
+            </textarea>
         </div>
     </div>
 </body>

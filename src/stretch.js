@@ -10,7 +10,17 @@ var fieldZMin = -10.0;
 var fieldZMax = 10.0;
 var fieldZStep = 0.1;
 
+var charge = 5;
+var chargeMin = -10.0;
+var chargeMax = 10.0;
+var chargetep = 0.1;
+
 var VelocityZeroMagnitude = 0.0;
+var fieldZMin = -10.0;
+var fieldZMax = 10.0;
+var fieldZStep = 0.1;
+
+var VelocityZeroDirection = 0.0;
 var fieldZMin = -10.0;
 var fieldZMax = 10.0;
 var fieldZStep = 0.1;
@@ -23,6 +33,24 @@ var fieldBoardLength = 300;
 var fieldBoardLengthMin = 0;
 var fieldBoardLengthMax = 1000;
 
+
+Object.defineProperty(window, "PixelNumber", {
+    get : function() {
+        return this._PixelNumber;
+    },
+    set: function(val) {
+        //console.log("watch: PixelNumber changed");
+        screen.pixelChanged = true;
+        this._PixelNumber = val;
+    }
+});
+
+window.PixelNumber = 18;
+var PixelNumberMin = 4;
+var PixelNumberMax = 72;
+var PixelNumberStep = 1;
+
+// All objects (without screen) are mounted under xa.
 var xa = {
     // Point Charge
     pc: {
@@ -53,14 +81,26 @@ var xa = {
             ellipse(this.x, this.y, 2 * this.r, 2 * this.r);
         },
 
+        /**
+         * get charge center in x-axis.
+         * @returns {number}
+         */
         centerX: function () {
             return this.x + this.r;
         },
 
+        /**
+         * get charge center in y-axis.
+         * @returns {number}
+         */
         centerY: function () {
             return this.y + this.r;
         },
 
+        /**
+         * Register event mousePressed of pc (Point Charge).
+         * @returns {number}
+         */
         registerMousePressed: function () {
             var distance = util.distance(this.centerX(), this.centerY(), mouseX, mouseY);
 
@@ -69,6 +109,10 @@ var xa = {
             }
         },
 
+        /**
+         * mousePressed event handler of pc (Point Charge).
+         * @returns {number}
+         */
         mousePressed: function () {
             //console.log("pc.mouseClicked");
             this.dragging = true;
@@ -78,17 +122,25 @@ var xa = {
             xa.run(0, 30);
         },
 
+        /**
+         * Register event mouseReleased of pc (Point Charge).
+         * @returns {number}
+         */
         registerMouseReleased: function () {
             this.mouseReleased();
         },
 
+        /**
+         * mouseReleased event handler of pc (Point Charge).
+         * @returns {number}
+         */
         mouseReleased: function () {
             this.dragging = false;
-        },
+        }
 
     },
 
-    // Initial Velocity
+    // Initial Velocity, velocity control
     vzero: {
         dragging: false, // Is the object being dragged?
         rollover: false, // Is the mouse over the ellipse?
@@ -122,14 +174,26 @@ var xa = {
             strokeWeight(1);
         },
 
+        /**
+         * get velocity control center in x-axis.
+         * @returns {number}
+         */
         centerX: function () {
             return this.x + this.r;
         },
 
+        /**
+         * get velocity control center in y-axis.
+         * @returns {number}
+         */
         centerY: function () {
             return this.y + this.r;
         },
 
+        /**
+         * Register event mousePressed of velocity control.
+         * @returns {number}
+         */
         registerMousePressed: function () {
             var distance = util.distance(this.centerX(), this.centerY(), mouseX, mouseY);
 
@@ -138,6 +202,10 @@ var xa = {
             }
         },
 
+        /**
+         * mousePressed event handler of velocity control.
+         * @returns {number}
+         */
         mousePressed: function () {
             //console.log("pc.mouseClicked");
             this.dragging = true;
@@ -146,52 +214,89 @@ var xa = {
             this.offsetY = this.y - mouseY;
         },
 
+        /**
+         * Register event mouseReleased of velocity control.
+         * @returns {number}
+         */
         registerMouseReleased: function () {
             this.mouseReleased();
         },
 
+        /**
+         * mouseReleased event handler of velocity control.
+         * @returns {number}
+         */
         mouseReleased: function () {
             this.dragging = false;
             xa.run(0, 30);
-        },
+        }
 
     },
 
-    // Field
+    // Field Boards
     fb: {
         x: 300,
         y: 200,
 
-        // width at y-axis --
+        // width at y-axis "--"
         d: fieldBoardDistance,
 
-        // width at x-axis |
+        // width at x-axis "|"
         l: fieldBoardLength,
 
+        /**
+         * get distance of two board
+         * @returns {number}
+         */
         getD: function() {
             return fieldBoardDistance;
         },
 
+        /**
+         * get length of two board
+         * @returns {number}
+         */
         getL: function() {
             return fieldBoardLength;
         },
 
+        /**
+         * get position of board 1
+         * @returns {{x: *, y: *}}
+         */
+        getBoard1Position: function() {
+            return {
+                x: this.x,
+                y: this.y
+            };
+        },
+
+        /**
+         * get position of board 2
+         * @returns {{x: *, y: *}}
+         */
+        getBoard2Position: function() {
+            return {
+                x: this.x,
+                y: this.y + this.getD()
+            };
+        },
+
         draw: function () {
             fill(color(66, 134, 244));
-            rect(this.x, this.y, this.getL(), 20);
+            rect(this.x, this.y - 20, this.getL(), 20);
             fill(color(255, 89, 89));
             rect(this.x, this.y + this.getD(), this.getL(), 20);
         }
     },
 
-    /** @var Array */
+    /** @var Array the locus points of running charge */
     result: [],
 
     isRan: false,
 
-    fieldy: 30,
-    fieldz: 0,
-    charge: 5,
+    //fieldy: 30,
+    //fieldz: 0,
 
     getInitialVelocity: function () {
         var r = {
@@ -201,6 +306,7 @@ var xa = {
         };
         return r;
     },
+
     getField: function (x, y, z, t) {
         if (x >= xa.fb.x && x <= xa.fb.x + xa.fb.getL() && y >= xa.fb.y && y <= xa.fb.y + xa.fb.getD())
             return {
@@ -211,9 +317,11 @@ var xa = {
         else
             return {x: 0, y: 0, z: 0};
     },
+
     getCharge: function (x, y, z, t) {
-        return xa.charge;
+        return charge;
     },
+
     getElectricForce: function (x, y, z, t) {
         var field = this.getField(x, y, z, t);
         var charge = this.getCharge(x, y, z, t);
@@ -223,15 +331,20 @@ var xa = {
             z: charge * field.z
         };
     },
+
     getInterval: function (t) {
         return 0.01;
     },
-    isInField: function (x, y) {
 
-    },
     getChargeMass: function (t) {
         return 0.1;
     },
+
+    /**
+     * Calculate the locus of point charge and push to result.
+     * @param timeFrom
+     * @param timeTo
+     */
     run: function (timeFrom, timeTo) {
         this.isRan = true;
 
@@ -300,29 +413,48 @@ var xa = {
                 screen.light(prev, now);
             }
 
+            var b1p = xa.fb.getBoard1Position();
+            var b2p = xa.fb.getBoard2Position();
+            var pp = prev.position;
+            var np = now.position;
+
+            if (util.isIntersect(b1p.x, b1p.y, b1p.x + xa.fb.getL(), b1p.y, pp.x, pp.y, np.x,np.y) ||
+                util.isIntersect(b2p.x, b2p.y, b2p.x + xa.fb.getL(), b2p.y, pp.x, pp.y, np.x,np.y)) {
+                break;
+            }
+
         }
         //console.log(this.result);
-    },
+    }
 
 };
 
+// Screen
 var screen = {
+
+    /**
+     * store pixel data (binary)
+     * @var Array
+     */
     pixel: [],
+
+    pixelChanged: false,
 
     visible: true,
 
     init: function() {
-        for (var i = 0; i <= this.pixelNumY; i++) {
+        this.pixel = [];
+        var pixelNumY = this.pixelNumY();
+        var pixelNumZ = this.pixelNumZ();
+        for (var i = 0; i <= pixelNumY; i++) {
             this.pixel[i] = [];
-            for (var j = 0; j <= this.pixelNumZ; j++)
+            for (var j = 0; j <= pixelNumZ; j++)
                 this.pixel[i][j] = 0;
         }
     },
 
     clear: function() {
-        for (var i = 0; i <= this.pixelNumY; i++)
-            for (var j = 0; j <= this.pixelNumZ; j++)
-                this.pixel[i][j] = 0;
+        this.init();
     },
 
     toggle: function() {
@@ -334,43 +466,69 @@ var screen = {
     startY: 95,
     startZ: -190,
 
-    pixelNumZ: 72,
-    pixelNumY: 72,
+    pixelNumZ: function () {
+        return PixelNumber;
+    },
 
-    pixelWidth: 5,
+    pixelNumY: function () {
+        return PixelNumber;
+    },
+
+    pixelWidth: function () {
+        return 380.0 / (PixelNumber + 1);
+    },
 
     draw: function () {
-        if (this.visible === false) return;
-        fill(color(0, 0, 0, 120));
-        strokeWeight(1);
-        stroke(200, 200, 200);
-        for (var i = 0; i <= this.pixelNumY; i++) {
-            for (var j = 0; j <= this.pixelNumZ; j++) {
-                if (this.pixel[j][i] == 1) {
-                    fill(color(255, 255, 255));
-                }
-                rect(1000 + this.pixelWidth * i, 95 + this.pixelWidth * j, this.pixelWidth, this.pixelWidth);
-                fill(color(0, 0, 0, 120));
+
+        try {
+            if (this.pixelChanged) {
+                //console.log("pixelChanged");
+                this.init();
+                this.pixelChanged = false;
             }
+
+            var pixelNumY = this.pixelNumY();
+            var pixelNumZ = this.pixelNumZ();
+            var pixelWidth = this.pixelWidth();
+
+            if (this.visible === false) return;
+            fill(color(0, 0, 0, 120));
+            strokeWeight(1);
+            stroke(200, 200, 200);
+            for (var i = 0; i <= pixelNumY; i++) {
+                for (var j = 0; j <= pixelNumZ; j++) {
+                    if (this.pixel[j][i] === 1) {
+                        fill(color(255, 255, 255));
+                    }
+                    rect(1000 + pixelWidth * i, 95 + pixelWidth * j, pixelWidth, pixelWidth);
+                    fill(color(0, 0, 0, 120));
+                }
+            }
+        } catch (e) {
+
         }
+
     },
     
     light: function (prev, next) {
+        var pixelNumY = this.pixelNumY();
+        var pixelNumZ = this.pixelNumZ();
+        var pixelWidth = this.pixelWidth();
         var mul = (this.d - prev.position.x)/(next.position.x - prev.position.x);
         var p = {
             x: screen.d,
             y: prev.position.y + (next.position.y - prev.position.y) * mul,
             z: prev.position.z + (next.position.z - prev.position.z) * mul
         };
-        var ypix = int((p.y - this.startY) / this.pixelWidth);
-        var zpix = int((p.z - this.startZ) / this.pixelWidth);
+        var ypix = int((p.y - this.startY) / pixelWidth);
+        var zpix = int((p.z - this.startZ) / pixelWidth);
 
-        if (ypix > this.pixelNumY || ypix < 0 || zpix > this.pixelNumZ || zpix < 0) {
+        if (ypix > pixelNumY || ypix < 0 || zpix > pixelNumZ || zpix < 0) {
 
         } else {
             this.pixel[ypix][zpix] = 1;
         }
-        console.log(ypix + "," + zpix);
+        //console.log(ypix + "," + zpix);
     },
 
     _fieldPairs: [],
@@ -388,7 +546,7 @@ var screen = {
 
             setTimeout(function () {
                 var fpi = screen._fieldPairsNext();
-                console.log(fpi);
+                //console.log(fpi);
                 fieldY = fpi[0];
                 fieldZ = fpi[1];
                 xa.run(0, 30);
@@ -401,11 +559,11 @@ function setup() {
     screen.init();
     createCanvas(windowWidth, windowHeight);
     var gui = createGui('Label');
-    gui.addGlobals('fieldY', 'fieldZ', 'fieldBoardDistance', 'fieldBoardLength');
+    gui.addGlobals('fieldY', 'fieldZ', 'charge', 'fieldBoardDistance', 'fieldBoardLength', 'PixelNumber');
 }
 
 function draw() {
-    background(220, 180, 200);
+    background(187, 234, 222);
     strokeWeight(0);
 
     xa.fb.draw();
@@ -450,8 +608,13 @@ function touchEnded() {
 
 function sinGraph() {
     var fieldPair = [];
-    for (var i = -1.2; i <= 1.2; i += 0.01) {
-        fieldPair.push([Math.sin(i*10) * 5, i * 5]);
+    for (var i = -0.6; i <= 0.6; i += 0.005) {
+        fieldPair.push([Math.sin(i*10.0) * 5.0, i * 10.0]);
     }
     screen.paintFromFieldPairs(fieldPair);
 }
+
+function customGraph() {
+    eval($('#customGraphText').val());
+}
+

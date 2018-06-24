@@ -1,0 +1,58 @@
+Arguments: 
+  /usr/bin/node /usr/bin/yarn add parcel
+
+PATH: 
+  /usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+
+Yarn version: 
+  1.5.1
+
+Node version: 
+  9.11.1
+
+Platform: 
+  linux x64
+
+npm manifest: 
+  {
+    "name": "elect-field",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.html",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/zhshize/elect-filed.git"
+    },
+    "author": "zhshize",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/zhshize/elect-filed/issues"
+    },
+    "homepage": "https://github.com/zhshize/elect-filed#readme"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: /home/zhangshize/Projects/elect-field/node_modules/parcel: Command failed.
+  Exit code: 1
+  Command: sh
+  Arguments: -c echo "You are looking for 'parcel-bundler'" && exit 1
+  Directory: /home/zhangshize/Projects/elect-field/node_modules/parcel
+  Output:
+  You are looking for 'parcel-bundler'
+      at ProcessTermError.MessageError (/usr/lib/node_modules/yarn/lib/cli.js:186:110)
+      at new ProcessTermError (/usr/lib/node_modules/yarn/lib/cli.js:226:113)
+      at ChildProcess.<anonymous> (/usr/lib/node_modules/yarn/lib/cli.js:30281:17)
+      at ChildProcess.emit (events.js:180:13)
+      at maybeClose (internal/child_process.js:936:16)
+      at Socket.stream.socket.on (internal/child_process.js:353:11)
+      at Socket.emit (events.js:180:13)
+      at Pipe._handle.close [as _onclose] (net.js:541:12)
