@@ -1,6 +1,7 @@
 # 平行板電場中的電荷移動模擬
 
 作者：國立中興大學資工系 張世澤 [mailbox@4ze.tw](mailto:mailbox@4ze.tw)    
+[Github: zhshize/elect-field](https://github.com/zhshize/elect-field)     
 [到網站上使用(online)](https://showcase.4ze.tw/elect-field/src/index.html)     
 [開始使用(本機程式檔)](src/index.html)
 
